@@ -57,7 +57,7 @@ private:
     IOLock *mapping_table_mutex;
     
     struct mapping_table_entry mapping_table[RMI_SMB2_MAP_SIZE];
-    u8 table_index;
+    u8 table_index {0};
     
     int rmi_smb_get_version();
     int rmi_smb_get_command_code(u16 rmiaddr, int bytecount,
