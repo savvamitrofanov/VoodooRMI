@@ -1,0 +1,35 @@
+language: cpp
+
+matrix:
+  include:
+  - os: osx
+    name: "Build"
+    osx_image: xcode11.6
+    compiler: clang
+
+    script:
+      - git clone https://github.com/savvamitrofanov/VoodooRMI
+      - git submodule update --init --recursive
+      - xcodebuild -jobs 1 -configuration Debug
+      - xcodebuild -jobs 1 -configuration Release
+
+    deploy:
+      provider: releases
+      skip_cleanup: true
+      file: "build/*/*/*.zip"
+      file_glob: true
+      api_key:
+        secure: GyScIA4uBBXAos9dSebjtIyxFOcvdryAQEXoMVu2Pev+REn9AWVZNg63ZE8azI0ulxzU0gPGP45YEuDYhuwrOm3QaPtHGbIz+7uXBo5vzvYnTH50r9h6FekTkd4oJv0p2v84e69lB1Y5YZITHRZfltKV9wFQMp+UTIMk5BPX/yd4/Ge2y+/ULNTbzRLuoPIOtSbfgaXP0i8yZBiS016A1/tQGiCzlajCuUAxZ6cYjVTTMr/lg+TbZXxNtu3XkSEmvfOYaWbBkBQ5EvBiawbfnzw6Cfy+OviKgADrjvRqjKi6TmhYvZhsN72dDkss449XNBFeQJcP/CMqjPfZ/7ZmBsoAebcLEhFXkSox//EsYio2AKINVZFm3h5N0XTKApHs7Xf9rGwMXVd09cXdiDWkkXR4/owtRrbH92fIjueCS2f7MblSw5+Qfy8h0dYpMWS30jePNQNp2d+2Tn0mwPDdP/C/Eq8eiZ9aRVGbU5C4TvJFUuOCJL0cM6piKhNp2j0Jm8Y1EzjbvdLA9PS7G4WQSIiKHp902jwWB2FTAFIkFxeNgsz2jShn30+5qWQgbiMdyjkbItyZl2JQCDxg+yEkyGyZRSGvCiSZ3EL/KRii/IFDT++9qRf8UvCniy08JQ6QoYYK/N1D/O3L1y8r5wQVjNRKy81VyEQrnYO0vJbHB+w=
+      on:
+        tags: true
+
+  - os: osx
+    name: "Analyze Clang"
+    osx_image: xcode11
+    compiler: clang
+
+    script:
+      - git clone https://github.com/savvamitrofanov/VoodooRMI
+      - git submodule update --init --recursive
+      - xcodebuild analyze -quiet -scheme VoodooRMI -configuration Debug CLANG_ANALYZER_OUTPUT=plist-html CLANG_ANALYZER_OUTPUT_DIR="$(pwd)/clang-analyze" && [ "$(find clang-analyze -name "*.html")" = "" ]
+      - xcodebuild analyze -quiet -scheme VoodooRMI -configuration Release CLANG_ANALYZER_OUTPUT=plist-html CLANG_ANALYZER_OUTPUT_DIR="$(pwd)/clang-analyze" && [ "$(find clang-analyze -name "*.html")" = "" ]
